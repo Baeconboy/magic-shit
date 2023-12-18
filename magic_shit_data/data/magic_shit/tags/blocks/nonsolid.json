@@ -1,0 +1,19 @@
+{
+    "values": [
+        "#minecraft:buttons",
+        "#minecraft:pressure_plates",
+        "#minecraft:banners",
+        "#minecraft:saplings",
+        "#magic_shit:small_mushrooms",
+        "#minecraft:replaceable",
+        "minecraft:sugar_cane",
+        "minecraft:water",
+        "minecraft:lava",
+        "#minecraft:small_flowers",
+        "#minecraft:tall_flowers",
+        "minecraft:pink_petals",
+        "minecraft:spore_blossom",
+        "#magic_shit:torches",
+        "#minecraft:climbable"
+    ]
+}

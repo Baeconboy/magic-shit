@@ -1,0 +1,40 @@
+new tags.blocks(nonsolid){
+    "values":[
+        "#minecraft:buttons",
+        "#minecraft:pressure_plates",
+        "#minecraft:banners",
+        "#minecraft:saplings",
+        "#magic_shit:small_mushrooms",
+        "#minecraft:replaceable",
+        "minecraft:sugar_cane",
+        "minecraft:water",
+        "minecraft:lava",
+        "#minecraft:small_flowers",
+        "#minecraft:tall_flowers",
+        "minecraft:pink_petals",
+        "minecraft:spore_blossom",
+        "#magic_shit:torches",
+        "#minecraft:climbable"
+
+    ]
+}
+
+new tags.blocks(small_mushrooms){
+    "values":[
+        "minecraft:red_mushroom",
+        "minecraft:brown_mushroom",
+        "minecraft:crimson_fungus",
+        "minecraft:warped_fungus"
+    ]
+}
+
+new tags.blocks(torches){
+    "values":[
+        "minecraft:torch",
+        "minecraft:wall_torch",
+        "minecraft:redstone_torch",
+        "minecraft:redstone_wall_torch",
+        "minecraft:soul_torch",
+        "minecraft:soul_wall_torch"
+    ]
+}

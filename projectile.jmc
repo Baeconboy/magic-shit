@@ -1,0 +1,150 @@
+import "./mana";
+class projectile {
+
+    function init(){
+        addDummy(vector.facing.x);
+        addDummy(vector.facing.y);
+        addDummy(vector.facing.z);
+        addDummy(projectile.bouncy.counter);
+
+        $default.projectile.bouncy.counter ??= 10;
+
+
+    }
+
+    function main(){
+        execute as @e[tag=projectile.fragile] at @s run projectile.behavior.fragile();
+        execute as @e[tag=projectile.bouncy] at @s run projectile.behavior.bouncy();
+    }
+
+    function getFacingVector(){
+        execute at @s anchored eyes positioned ^ ^ ^ run {
+
+            summon marker ^ ^ ^1 {UUID:[I;0,0,0,0],Tags:["vector"]};  // UUID: 00000000-0000-0000-0000-000000000000
+            summon marker ^ ^ ^ {UUID:[I;0,0,0,1],Tags:["vector.anchor"]}; //UUID: 00000000-0000-0000-0000-000000000001
+
+            vector.facing.x:@s = vector.facing.y:@s = vector.facing.z:@s = 0;
+
+
+            execute store result score @s vector.facing.x run data get entity @e[limit=1,tag=vector.anchor,type=minecraft:marker,distance=..1.5] Pos[0] 10000;
+            execute store result score @s vector.facing.y run data get entity @e[limit=1,tag=vector.anchor,type=minecraft:marker,distance=..1.5] Pos[1] 10000;
+            execute store result score @s vector.facing.z run data get entity @e[limit=1,tag=vector.anchor,type=minecraft:marker,distance=..1.5] Pos[2] 10000;
+
+            //tellraw @s vector.f
+            
+            execute as 00000000-0000-0000-0000-000000000000 store result score @s vector.facing.x run data get entity @s Pos[0] 10000;
+            execute as 00000000-0000-0000-0000-000000000000 store result score @s vector.facing.y run data get entity @s Pos[1] 10000;
+            execute as 00000000-0000-0000-0000-000000000000 store result score @s vector.facing.z run data get entity @s Pos[2] 10000;
+
+            vector.facing.x:@s -= vector.facing.x:@e[tag=vector,type=minecraft:marker,distance=..1.5];
+            vector.facing.y:@s -= vector.facing.y:@e[tag=vector,type=minecraft:marker,distance=..1.5];
+            vector.facing.z:@s -= vector.facing.z:@e[tag=vector,type=minecraft:marker,distance=..1.5];
+
+            kill 00000000-0000-0000-0000-000000000000;
+            kill 00000000-0000-0000-0000-000000000001;
+
+
+
+        }
+    }
+
+    function setOwner(){
+        addTag(@s, executing);
+        execute as @e[tag=projectile.setup,distance=..5] run data modify entity @s Owner set from entity @e[tag=executing,limit=1, sort=nearest] UUID;
+        removeTag(@s, executing);
+    }
+
+    function setMotion(){
+        vector.facing.x:@e[tag=projectile.setup,distance=..5] = vector.facing.x:@s;
+        vector.facing.y:@e[tag=projectile.setup,distance=..5] = vector.facing.y:@s;
+        vector.facing.z:@e[tag=projectile.setup,distance=..5] = vector.facing.z:@s;
+
+        execute as @e[tag=projectile.setup,distance=..5] run {
+            execute store result entity @s Motion[0] double -0.0001 run scoreboard players get @s vector.facing.x;
+            execute store result entity @s Motion[1] double -0.0001 run scoreboard players get @s vector.facing.y;
+            execute store result entity @s Motion[2] double -0.0001 run scoreboard players get @s vector.facing.z;
+        }
+    }
+
+    function initializeProjectile(){
+        projectile.getFacingVector();
+        projectile.setOwner();
+        projectile.setMotion();
+        tag @e[tag=projectile.setup,distance=..5] remove projectile.setup;
+        }
+
+    function test(){
+        $cost = 100;
+        $success = mana.useMana();
+        if ($success){
+            execute anchored eyes positioned ^ ^ ^ run summon arrow ^ ^ ^ {Tags:["projectile.setup", "projectile.bouncy", "projectile.fragile"],damage:-0.00001d, Silent:1b};
+        }
+        projectile.initializeProjectile();
+    }
+    function getCurrentMotion(){
+        execute store result score @s vector.facing.x run data get entity @s Motion[0] 10000;
+        execute store result score @s vector.facing.y run data get entity @s Motion[1] 10000;
+        execute store result score @s vector.facing.z run data get entity @s Motion[2] 10000;
+
+    }
+
+    class behavior{
+        class fragile{
+            function onBlockHit(){
+                kill @s;
+            }
+            function onEntityHit(){
+            }
+        }
+        class bouncy{
+            function onBlockHit(){
+                data merge entity @s {inGround:0b};
+                
+                execute at @s run {
+                    //tellraw @a vector.facing.y:@s.toString();
+                    execute as @e[scores={vector.facing.x=..-1}] at @s unless block ~-0.1 ~ ~ #magic_shit:nonsolid run tag @s add projectile.bouncy.x;
+                    execute as @e[scores={vector.facing.x=1..}] at @s unless block ~0.1 ~ ~ #magic_shit:nonsolid run tag @s add projectile.bounce.x;
+
+                    execute as @e[scores={vector.facing.y=..-1}] at @s unless block ~ ~-0.1 ~ #magic_shit:nonsolid run tag @s add projectile.bouncy.y;
+                    execute as @e[scores={vector.facing.y=1..}] at @s unless block ~ ~0.1 ~ #magic_shit:nonsolid run tag @s add projectile.bouncy.y;
+
+                    execute as @e[scores={vector.facing.z=..-1}] at @s unless block ~ ~ ~-0.1 #magic_shit:nonsolid run tag @s add projectile.bouncy.z;
+                    execute as @e[scores={vector.facing.z=1..}] at @s unless block ~ ~ ~0.1 #magic_shit:nonsolid run tag @s add projectile.bouncy.z;
+
+                    if (vector.facing.x:@s matches -1000..1000) removeTag(@s, projectile.bouncy.x);
+                    if (vector.facing.y:@s matches -3000..3000) removeTag(@s, projectile.bouncy.y);
+                    if (vector.facing.z:@s matches -1000..1000) removeTag(@s, projectile.bouncy.z);
+
+                    if (entity @s[tag=!projectile.bouncy.x, tag=!projectile.bouncy.y, tag=!projectile.bouncy.z]) addTag(@s, projectile.bouncy.stop);
+
+                    if (entity @s[tag=projectile.bouncy.x] || entity @s[tag=projectile.bouncy.y] || entity @s[tag=projectile.bouncy.z]) {
+                        projectile.bouncy.counter:@s += 1;
+                        playsound minecraft:entity.allay.item_thrown neutral @a ~ ~ ~ 0.1 2;
+                        }
+
+                    if (entity @s[tag=!projectile.bouncy.stop, tag=!projectile.bouncy.stop.x, tag=projectile.bouncy.x]) execute store result entity @s Motion[0] double -0.00009 run scoreboard players get @s vector.facing.x;
+                    if (entity @s[tag=!projectile.bouncy.stop, tag=!projectile.bouncy.stop.x, tag=!projectile.bouncy.x]) execute store result entity @s Motion[0] double 0.00009 run scoreboard players get @s vector.facing.x;
+                    if (entity @s[tag=!projectile.bouncy.stop, tag=!projectile.bouncy.stop.y, tag=projectile.bouncy.y]) execute store result entity @s Motion[1] double -0.00009 run scoreboard players get @s vector.facing.y;
+                    if (entity @s[tag=!projectile.bouncy.stop, tag=!projectile.bouncy.stop.y, tag=!projectile.bouncy.y]) execute store result entity @s Motion[1] double 0.00009 run scoreboard players get @s vector.facing.y;
+                    if (entity @s[tag=!projectile.bouncy.stop, tag=!projectile.bouncy.stop.z, tag=projectile.bouncy.z]) execute store result entity @s Motion[2] double -0.00009 run scoreboard players get @s vector.facing.z;
+                    if (entity @s[tag=!projectile.bouncy.stop, tag=!projectile.bouncy.stop.z, tag=!projectile.bouncy.z]) execute store result entity @s Motion[2] double 0.00009 run scoreboard players get @s vector.facing.z;
+
+                    if (projectile.bouncy.counter:@s == $default.projectile.bouncy.counter) addTag(@s, projectile.bouncy.stop);
+
+                    tag @s[tag=projectile.bouncy.x] remove projectile.bouncy.x;
+                    tag @s[tag=projectile.bouncy.y] remove projectile.bouncy.y;
+                    tag @s[tag=projectile.bouncy.z] remove projectile.bouncy.z;
+                }
+            }
+        }
+        class constant{}
+        function fragile(){
+            if(entity @s[nbt={inGround:1b},tag=projectile.bouncy.stop]) projectile.behavior.fragile.onBlockHit();
+        }
+        function bouncy(){
+            if(entity @s[nbt={inGround:0b}]) projectile.getCurrentMotion();
+
+            if(entity @s[nbt={inGround:1b},tag=!projectile.bouncy.stop]) projectile.behavior.bouncy.onBlockHit();
+        }
+    }
+}

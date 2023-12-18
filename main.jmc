@@ -1,0 +1,92 @@
+import "./*";
+
+Scoreboard.add(player.click, minecraft.used:minecraft.warped_fungus_on_a_stick);
+addDummy(player.click.id);
+//addDummy(player.click.id.offhand);
+
+mana.init();
+projectile.init();
+spells.init();
+
+Player.firstJoin(initializePlayer);
+Player.die(onDeath = onPlayerDeath, onRespawn = onPlayerRespawn);
+
+
+
+function __tick__(){
+    $temp = random value 0..500 minecraft:blocks/budding_amethyst;
+    //execute as @a at @s run {
+    //    switch($temp){
+    //        case 1:
+    //            summon marker ~ ~ ~ {Tags:["test"]};
+    //            spreadplayers ~ ~ 100 100 false @e[tag=test];
+    //            execute as @e[tag=test] at @s run playsound minecraft:entity.allay.death master @a ~ ~100 ~ 1 0.5 0.1;
+    //            kill @e[tag=test];
+    //        case 2:
+    //            summon marker ~ ~ ~ {Tags:["test"]};
+    //            spreadplayers ~ ~ 100 100 false @e[tag=test];
+    //            execute as @e[tag=test] at @s run playsound minecraft:entity.warden.tendril_clicks master @a ~ ~ ~ 1 0.5 0.2;
+    //            kill @e[tag=test];
+    //        case 3:
+    //            summon marker ~ ~ ~ {Tags:["test"]};
+    //            spreadplayers ~ ~ 100 100 false @e[tag=test];
+    //            execute as @e[tag=test] at @s run playsound minecraft:entity.warden.heartbeat master @a ~ ~ ~ 1 0 0.2;
+    //            kill @e[tag=test];
+    //        case 4:
+    //            summon marker ~ ~ ~ {Tags:["test"]};
+    //            spreadplayers ~ ~ 100 100 false @e[tag=test];
+    //            execute as @e[tag=test] at @s run playsound minecraft:block.sculk_shrieker.shriek master @a ~ ~ ~ 1 0 0.2;
+    //            kill @e[tag=test];
+    //        case 5:
+    //            summon marker ~ ~ ~ {Tags:["test"]};
+    //            spreadplayers ~ ~ 100 100 false @e[tag=test];
+    //            execute as @e[tag=test] at @s run playsound minecraft:block.conduit.attack.target master @a ~ ~ ~ 1 0 0.2;
+    //            kill @e[tag=test];
+    //        case 6:
+    //            summon marker ~ ~ ~ {Tags:["test"]};
+    //            spreadplayers ~ ~ 100 100 false @e[tag=test];
+    //            execute as @e[tag=test] at @s run playsound minecraft:ambient.warped_forest.mood master @a ~ ~ ~ 1 2 0.2;
+    //            kill @e[tag=test];
+    //        case 7:
+    //            summon marker ~ ~ ~ {Tags:["test"]};
+    //            spreadplayers ~ ~ 100 100 false @e[tag=test];
+    //            execute as @e[tag=test] at @s run playsound minecraft:ambient.crimson_forest.mood master @a ~ ~ ~ 1 2 0.2;
+    //            kill @e[tag=test];
+    //        case 8:
+    //            summon marker ~ ~ ~ {Tags:["test"]};
+    //            spreadplayers ~ ~ 100 100 false @e[tag=test];
+    //            execute as @e[tag=test] at @s run playsound minecraft:ambient.soul_sand_valley.mood master @a ~ ~ ~ 1 2 0.2;
+    //            kill @e[tag=test];
+    //
+    //    }
+    //}
+    execute as @e[scores={mana.max=0..}] run {
+        if (player.click:@s > 0){
+            addTag(@s, player.clicked);
+            player.click.id:@s = data get entity @s SelectedItem.tag.CustomModelData;
+            if (player.click.id:@s == 0) player.click.id:@s = data get entity @s Inventory[{Slot:-106b, id: "minecraft:warped_fungus_on_a_stick"}].tag.CustomModelData;
+        }
+    }
+
+    mana.main();
+    projectile.main();
+    spells.main();
+    player.click:@e = 0;
+    tag @e[tag=player.clicked] remove player.clicked;
+}
+
+function initializePlayer(){
+    mana.max:@s ??= $default.mana.max;
+    mana:@s ??= mana.max:@s;
+    mana.calc_percentage();
+}
+
+function onPlayerDeath(){
+    tellraw @s "L";
+}
+
+function onPlayerRespawn(){
+    mana:@s = mana.max:@s;
+    mana.useManaMacro(cost="0",mode="");
+    mana.cooldown:@s = 0;
+}

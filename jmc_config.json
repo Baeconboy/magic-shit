@@ -1,0 +1,7 @@
+{
+    "namespace": "magic_shit",
+    "description": "this is magical on god",
+    "pack_format": "26",
+    "target": "main.jmc",
+    "output": "magic_shit_data"
+}

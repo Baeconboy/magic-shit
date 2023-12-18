@@ -1,0 +1,16 @@
+    
+class spells {
+        class cherry{
+            function onUse(){
+                $cost = 50;
+                $success = mana.useMana();
+                if ($success) {
+                    //particle minecraft:cherry_leaves ~ ~ ~ 1 1 1 0 100;
+                    execute anchored eyes rotated ~ ~90 run Particle.helix("minecraft:cherry_leaves", 0.3,5,50);
+                    execute anchored eyes positioned ^ ^ ^2 rotated ~ ~90 run Particle.spiral("minecraft:cherry_leaves", 0.3,5,50);
+                    execute anchored eyes positioned ^ ^ ^-2 rotated ~ ~90 run Particle.spiral("minecraft:cherry_leaves", 0.3,5,50);
+                    playsound magic_shit:party_horn player @a ~ ~ ~ 1 1;
+                }
+            }
+    }
+    }

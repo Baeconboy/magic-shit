@@ -1,0 +1,25 @@
+import './spells/cherry';
+class spells{
+
+    function init(){
+        addDummy(player.click.wand);
+        addDummy(player.click.spell);
+    }
+    function main(){
+        execute as @e[tag=player.clicked] at @s run {
+            execute store result storage magic_shit:data player.click_id double 0.001 run player.click.id:@s.get();
+            player.click.wand:@s = data get storage magic_shit:data player.click_id;
+            $temp = player.click.wand:@s;
+            $temp *= 1000;
+            player.click.spell:@s = player.click.id:@s;
+            player.click.spell:@s -= $temp;
+
+            $spell = player.click.spell:@s;
+
+            switch($spell){
+                case 4:
+                    spells.cherry.onUse();
+            }
+        }
+    }
+}

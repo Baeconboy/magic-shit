@@ -1,0 +1,12 @@
+#define addDummy(objectiveName) scoreboard objectives add objectiveName dummy
+#define removeTag(player,tagName) tag player remove tagName
+#define addTag(player,tagName) tag player add tagName
+
+
+#bind __namespace__
+
+#credit "Datapack by Baecon"
+#credit ""
+#credit "Contacts:"
+#credit "Github: https://github.com/Baeconboy"
+#credit "Discord: baecoom"
